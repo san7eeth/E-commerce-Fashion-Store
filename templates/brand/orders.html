@@ -1,0 +1,238 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Orders - Brand Account</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="flex min-h-screen">
+        {% include "brand/sidebar.html" %}
+        
+        <!-- Main Content -->
+        <div class="flex-1 p-8 lg:p-12">
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-2xl font-bold text-gray-900">Orders</h1>
+                <a href="{% url 'download_orders_report' %}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-all duration-200">
+                    <i class="fas fa-download mr-2"></i> Export All Orders
+                </a>
+            </div>
+
+            <!-- Messages -->
+            {% if messages %}
+                <div class="mb-6 space-y-2">
+                    {% for message in messages %}
+                        <div class="p-4 rounded-lg fade-in {% if message.tags == 'success' %}bg-green-50 text-green-800{% elif message.tags == 'error' %}bg-red-50 text-red-800{% else %}bg-blue-50 text-blue-800{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Filters -->
+            <div class="bg-white p-6 rounded-xl shadow-sm mb-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Filter Orders</h2>
+                <form method="GET" action="{% url 'brand_orders' %}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                        <label for="product_id" class="block text-sm font-medium text-gray-700 mb-1">Product</label>
+                        <select name="product_id" id="product_id" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="">All Products</option>
+                            {% for product in products %}
+                                <option value="{{ product.product_id }}" {% if product == selected_product %}selected{% endif %}>{{ product.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                        <input type="date" name="start_date" id="start_date" value="{{ start_date|default_if_none:'' }}" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="end_date" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                        <input type="date" name="end_date" id="end_date" value="{{ end_date|default_if_none:'' }}" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div class="flex items-end space-x-3">
+                        <button type="submit" class="w-full px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-all duration-200">
+                            <i class="fas fa-filter mr-2"></i> Apply Filters
+                        </button>
+                        <a href="{% url 'brand_orders' %}" class="px-4 py-2.5 bg-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-300 transition-all duration-200">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    </div>
+                </form>
+                {% if selected_product or start_date or end_date %}
+                    <div class="mt-4 p-4 bg-gray-50 rounded-lg flex items-center justify-between">
+                        <p class="text-sm text-gray-600">
+                            Showing orders
+                            {% if selected_product %} for <span class="font-medium">{{ selected_product.name }}</span>{% endif %}
+                            {% if start_date or end_date %}
+                                from {% if start_date %}{{ start_date }}{% else %}start{% endif %}
+                                to {% if end_date %}{{ end_date }}{% else %}now{% endif %}
+                            {% endif %}
+                        </p>
+                        <a href="{% url 'download_orders_report' %}?{% if selected_product %}product_id={{ selected_product.product_id }}&{% endif %}{% if start_date %}start_date={{ start_date }}&{% endif %}{% if end_date %}end_date={{ end_date }}{% endif %}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-all duration-200">
+                            <i class="fas fa-download mr-2"></i> Download Filtered Report
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Orders Table -->
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                {% if orders %}
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="py-3 px-6 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Order ID</th>
+                                    <th class="py-3 px-6 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Customer</th>
+                                    <th class="py-3 px-6 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Date</th>
+                                    <th class="py-3 px-6 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                                    <th class="py-3 px-6 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Total</th>
+                                    <th class="py-3 px-6 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                                    <th class="py-3 px-6 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Returns</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                {% for order in orders %}
+                                    <tr class="hover:bg-gray-50 transition-all duration-150">
+                                        <td class="py-4 px-6 text-sm text-gray-900">{{ order.order_id }}</td>
+                                        <td class="py-4 px-6 text-sm text-gray-900">{{ order.customer.name }}</td>
+                                        <td class="py-4 px-6 text-sm text-gray-600">{{ order.created_at|date:"Y-m-d" }}</td>
+                                        <td class="py-4 px-6">
+                                            <span class="inline-flex px-3 py-1 rounded-full text-xs font-medium 
+                                                {% if order.status == 'pending' %}bg-yellow-100 text-yellow-800
+                                                {% elif order.status == 'processing' %}bg-blue-100 text-blue-800
+                                                {% elif order.status == 'shipped' %}bg-indigo-100 text-indigo-800
+                                                {% elif order.status == 'out_for_delivery' %}bg-purple-100 text-purple-800
+                                                {% else %}bg-green-100 text-green-800{% endif %}">
+                                                {{ order.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td class="py-4 px-6 text-sm text-gray-900">₹{{ order.total_amount|floatformat:2 }}</td>
+                                        <td class="py-4 px-6">
+                                            <form method="POST" action="{% url 'update_order_status' order.order_id %}">
+                                                {% csrf_token %}
+                                                <select name="status" class="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" onchange="this.form.submit()">
+                                                    <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Ordered</option>
+                                                    <option value="processing" {% if order.status == 'processing' %}selected{% endif %}>Processing</option>
+                                                    <option value="shipped" {% if order.status == 'shipped' %}selected{% endif %}>Shipped</option>
+                                                    <option value="out_for_delivery" {% if order.status == 'out_for_delivery' %}selected{% endif %}>Out for Delivery</option>
+                                                    <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Delivered</option>
+                                                </select>
+                                            </form>
+                                        </td>
+                                        <td class="py-4 px-6">
+                                            {% with has_return_request=False %}
+                                                {% for item in order.items.all %}
+                                                    {% if selected_product %}
+                                                        {% if item.product == selected_product and item.return_request %}
+                                                            <div class="mb-3">
+                                                                <p class="text-sm font-medium text-gray-900">{{ item.product.name }}</p>
+                                                                <p class="text-xs text-gray-600 mt-1">
+                                                                    Status: 
+                                                                    <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium 
+                                                                        {% if item.return_request.status == 'requested' %}bg-yellow-100 text-yellow-800
+                                                                        {% elif item.return_request.status == 'approved' %}bg-blue-100 text-blue-800
+                                                                        {% elif item.return_request.status == 'rejected' %}bg-red-100 text-red-800
+                                                                        {% elif item.return_request.status == 'processed' %}bg-green-100 text-green-800{% endif %}">
+                                                                        {{ item.return_request.get_status_display }}
+                                                                    </span>
+                                                                </p>
+                                                                {% if item.return_request.reason %}
+                                                                    <p class="text-xs text-gray-500 mt-1">Reason: {{ item.return_request.reason }}</p>
+                                                                {% endif %}
+                                                                <p class="text-xs text-gray-500 mt-1">Requested: {{ item.return_request.request_date|date:"Y-m-d" }}</p>
+                                                                {% if item.return_request.status == 'requested' %}
+                                                                    <form method="POST" action="{% url 'update_return_status' item.return_request.id %}">
+                                                                        {% csrf_token %}
+                                                                        <select name="status" class="mt-2 p-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" onchange="this.form.submit()">
+                                                                            <option value="requested" selected>Requested</option>
+                                                                            <option value="approved">Approve</option>
+                                                                            <option value="rejected">Reject</option>
+                                                                        </select>
+                                                                    </form>
+                                                                {% endif %}
+                                                            </div>
+                                                            {% if not has_return_request %}
+                                                                {% with has_return_request=True %}
+                                                                {% endwith %}
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% elif item.return_request %}
+                                                        <div class="mb-3">
+                                                            <p class="text-sm font-medium text-gray-900">{{ item.product.name }}</p>
+                                                            <p class="text-xs text-gray-600 mt-1">
+                                                                Status: 
+                                                                <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium 
+                                                                    {% if item.return_request.status == 'requested' %}bg-yellow-100 text-yellow-800
+                                                                    {% elif item.return_request.status == 'approved' %}bg-blue-100 text-blue-800
+                                                                    {% elif item.return_request.status == 'rejected' %}bg-red-100 text-red-800
+                                                                    {% elif item.return_request.status == 'processed' %}bg-green-100 text-green-800{% endif %}">
+                                                                    {{ item.return_request.get_status_display }}
+                                                                </span>
+                                                            </p>
+                                                            {% if item.return_request.reason %}
+                                                                <p class="text-xs text-gray-500 mt-1">Reason: {{ item.return_request.reason }}</p>
+                                                            {% endif %}
+                                                            <p class="text-xs text-gray-500 mt-1">Requested: {{ item.return_request.request_date|date:"Y-m-d" }}</p>
+                                                            {% if item.return_request.status == 'requested' %}
+                                                                <form method="POST" action="{% url 'update_return_status' item.return_request.id %}">
+                                                                    {% csrf_token %}
+                                                                    <select name="status" class="mt-2 p-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" onchange="this.form.submit()">
+                                                                        <option value="requested" selected>Requested</option>
+                                                                        <option value="approved">Approve</option>
+                                                                        <option value="rejected">Reject</option>
+                                                                    </select>
+                                                                </form>
+                                                            {% endif %}
+                                                        </div>
+                                                        {% if not has_return_request %}
+                                                            {% with has_return_request=True %}
+                                                            {% endwith %}
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                                {% if order.items.all|length > 0 %}
+                                                    {% if selected_product %}
+                                                        {% if not has_return_request %}
+                                                            <p class="text-xs text-gray-500">No returns for {{ selected_product.name }}.</p>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        {% if not has_return_request %}
+                                                            <p class="text-xs text-gray-500">No return requests.</p>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% endwith %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="p-8 text-center">
+                        <p class="text-gray-500 text-sm">No orders found.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

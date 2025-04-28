@@ -1,0 +1,43 @@
+<!-- filepath: /c:/fashion project/fashion/templates/aboutus.html -->
+{% load static %}
+{% include "header.html" %}
+<!DOCTYPE html>
+<body>
+    
+    <main class="about-us">
+        <div class="container">
+            <h1>About Us</h1>
+            <p>
+                Welcome to our fashion store! We are passionate about bringing you the latest trends and timeless styles that empower you to express your unique personality. Our journey began with a simple idea: to create a space where fashion meets quality and affordability.
+            </p>
+            <h2>Our Mission</h2>
+            <p>
+                Our mission is to provide our customers with high-quality fashion products that inspire confidence and creativity. We believe that everyone deserves to look and feel their best, and we strive to make that a reality through our carefully curated collections.
+            </p>
+            <h2>Meet Our Team</h2>
+            <div class="team">
+                <div class="team-member">
+                    <img src="{% static 'ecommerceapp/images/about1.jpg' %}" alt="Team Member 1" />
+                    <h3>Jane Doe</h3>
+                    <p>Founder & CEO</p>
+                    <p>With over a decade of experience in the fashion industry, Jane leads our team with a vision for innovation and excellence.</p>
+                </div>
+                <div class="team-member">
+                    <img src="{% static 'ecommerceapp/images/about2.jpg' %}" alt="Team Member 2" />
+                    <h3>John Smith</h3>
+                    <p>Creative Director</p>
+                    <p>John is the creative force behind our collections, ensuring that every piece reflects our brand's commitment to style and quality.</p>
+                </div>
+                <div class="team-member">
+                    <img src="{% static 'ecommerceapp/images/about3.jpg' %}" alt="Team Member 3" />
+                    <h3>Emily Johnson</h3>
+                    <p>Marketing Manager</p>
+                    <p>Emily connects our brand with our customers, sharing our story and values through engaging campaigns and social media.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    {% include "footer.html" %}
+</body>
+</html>

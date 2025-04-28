@@ -1,0 +1,168 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <link rel="stylesheet" href="{% static 'ecommerceapp/css/styles.css' %}">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    {% include "customer/customerheader.html" %}
+    
+    <main class="cart-container">
+        <h1 class="cart-title">Your Cart</h1>
+        <div class="cart-table-container">
+            <table class="cart-table">
+                <thead>
+                    <tr class="cart-header">
+                        <th class="cart-header-item">Product</th>
+                        <th class="cart-header-item">Size</th>
+                        <th class="cart-header-item">Quantity</th>
+                        <th class="cart-header-item">Total</th>
+                        <th class="cart-header-item">Remove</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                    <tr class="cart-item">
+                        <td class="cart-item-details">
+                            <img src="{{ item.product.image.url|default:'/static/default.jpg' }}" alt="{{ item.product.name|default:'No name' }}" class="cart-item-image">
+                            <div>
+                                <p class="cart-item-name">{{ item.product.name|default:'No name' }}</p>
+                                <p class="cart-item-price">{{ item.product.discount_price|default:item.product.price|default:'No price' }}<span>Rs</span></p>
+                            </div>
+                        </td>
+                        <td>
+                            <select class="size-select" data-id="{{ item.id }}">
+                                {% for size in item.product.sizes.all %}
+                                <option value="{{ size.size_type }}" {% if size.size_type == item.size.size_type %}selected{% endif %}>
+                                    {{ size.size_type }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td class="cart-item-quantity">
+                            <div class="quantity-controls">
+                                <button class="quantity-button decrease" data-id="{{ item.id }}"><i class="fas fa-minus"></i></button>
+                                <input type="text" class="quantity-input" value="{{ item.quantity|default:'0' }}" readonly>
+                                <button class="quantity-button increase" data-id="{{ item.id }}"><i class="fas fa-plus"></i></button>
+                            </div>
+                        </td>
+                        <td class="cart-item-total">{{ item.total_price|default:'0.00' }}<span>Rs</span></td>
+                        <td>
+                            <button class="remove-button" data-id="{{ item.id }}"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4">Your cart is empty.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="cart-summary">
+            <p class="summary-total">Estimated Total: {{ cart_total|floatformat:2 }}<span>Rs</span></p>
+            <p class="summary-note">Taxes, discounts, and shipping calculated at checkout.</p>
+            <a href="{% url 'checkout' %}" class="checkout-button">Proceed to Checkout</a>
+        </div>
+    </main>
+    
+    {% include "customer/customerfooter.html" %}
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Quantity Increase
+            document.querySelectorAll('.quantity-button.increase').forEach(button => {
+                button.addEventListener('click', () => updateQuantity(button.dataset.id, 1));
+            });
+        
+            // Quantity Decrease
+            document.querySelectorAll('.quantity-button.decrease').forEach(button => {
+                button.addEventListener('click', () => updateQuantity(button.dataset.id, -1));
+            });
+        
+            // Remove Item
+            document.querySelectorAll('.remove-button').forEach(button => {
+                button.addEventListener('click', () => removeItem(button.dataset.id));
+            });
+        
+            // Change Size
+            document.querySelectorAll('.size-select').forEach(select => {
+                select.addEventListener('change', () => updateSize(select.dataset.id, select.value));
+            });
+        });
+        
+        function updateQuantity(itemId, change) {
+            fetch('{% url "update_cart" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    item_id: itemId,
+                    change: change
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.error);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+        
+        function removeItem(itemId) {
+            fetch('{% url "remove_from_cart" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    item_id: itemId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.error);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+        
+        function updateSize(itemId, newSize) {
+            fetch('{% url "update_cart_size" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    item_id: itemId,
+                    new_size: newSize
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.error);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>

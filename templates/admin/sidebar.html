@@ -1,0 +1,147 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" />
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f9fafb;
+        }
+        .sidebar {
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            overflow-x: hidden;
+        }
+        .sidebar-closed {
+            width: 80px;
+        }
+        .sidebar-open {
+            width: 280px;
+        }
+        .sidebar-closed .nav-text,
+        .sidebar-closed .brand-text,
+        .sidebar-closed .menu-category,
+        .sidebar-closed .profile-details {
+            display: none !important;
+        }
+        .sidebar-closed .nav-icon {
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .nav-item {
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .nav-item:hover {
+            background-color: #f3f4f6;
+        }
+        .nav-item.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .nav-item.active:hover {
+            background-color: #2563eb;
+        }
+        .profile-panel {
+            transition: all 0.3s ease;
+        }
+        .profile-panel:hover {
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div id="sidebar" class="fixed h-screen bg-white sidebar sidebar-open flex flex-col border-r border-gray-100 z-50">
+        <!-- Top Section with Logo -->
+        <div class="p-6 pb-2">
+            <button id="toggleSidebar" class="text-gray-500 hover:text-blue-600 focus:outline-none">
+                <i class="fas fa-bars text-lg"></i>
+            </button>
+        </div>
+        
+        <!-- Admin Profile -->
+        <div class="px-6 py-4">
+            <div class="profile-panel flex items-center p-3 rounded-xl bg-gray-50">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div class="profile-details ml-3">
+                    <p class="text-sm font-medium text-gray-800">Admin User</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="px-6 flex-1 overflow-y-auto">
+            <!-- Main Navigation -->
+            <nav>
+                <a class="nav-item {% if request.resolver_match.url_name == 'adminhome' %}active{% endif %} flex items-center p-3 mb-2" href="{% url 'adminhome' %}">
+                    <i class="fas fa-gauge-high nav-icon w-6 text-center"></i>
+                    <span class="nav-text ml-3 font-medium">Dashboard</span>
+                </a>
+                <a class="nav-item {% if request.resolver_match.url_name == 'brand_verification' %}active{% endif %} flex items-center p-3 mb-2 text-gray-700" href="{% url 'brand_verification' %}">
+                    <i class="fas fa-check-circle nav-icon w-6 text-center"></i>
+                    <span class="nav-text ml-3 font-medium">Verification</span>
+                </a>
+                <a class="nav-item {% if request.resolver_match.url_name == 'admin_orders' %}active{% endif %} flex items-center p-3 mb-2 text-gray-700" href="{% url 'admin_orders' %}">
+                    <i class="fas fa-box nav-icon w-6 text-center"></i>
+                    <span class="nav-text ml-3 font-medium">Orders</span>
+                </a>
+                <a class="nav-item {% if request.resolver_match.url_name == 'admin_products' %}active{% endif %} flex items-center p-3 mb-2 text-gray-700" href="{% url 'admin_products' %}">
+                    <i class="fas fa-cube nav-icon w-6 text-center"></i>
+                    <span class="nav-text ml-3 font-medium">Products</span>
+                </a>
+                <a class="nav-item {% if request.resolver_match.url_name == 'admin_reviews' %}active{% endif %} flex items-center p-3 mb-2 text-gray-700" href="{% url 'admin_reviews' %}">
+                    <i class="fas fa-star nav-icon w-6 text-center"></i>
+                    <span class="nav-text ml-3 font-medium">Reviews</span>
+                </a>
+                <a class="nav-item {% if request.resolver_match.url_name == 'admin_users' %}active{% endif %} flex items-center p-3 mb-2 text-gray-700" href="{% url 'admin_users' %}">
+                    <i class="fas fa-users nav-icon w-6 text-center"></i>
+                    <span class="nav-text ml-3 font-medium">Users</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Bottom Section -->
+        <div class="px-6 py-4 mt-auto border-t border-gray-100">
+            <a class="nav-item flex items-center p-3 text-gray-700" href="{% url 'logout' %}">
+                <i class="fas fa-sign-out-alt nav-icon w-6 text-center"></i>
+                <span class="nav-text ml-3 font-medium">Logout</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const toggleSidebarBtn = document.getElementById('toggleSidebar');
+
+        toggleSidebarBtn.addEventListener('click', () => {
+            if (sidebar.classList.contains('sidebar-open')) {
+                sidebar.classList.remove('sidebar-open');
+                sidebar.classList.add('sidebar-closed');
+                if (mainContent) {
+                    mainContent.classList.remove('ml-[280px]');
+                    mainContent.classList.add('ml-[80px]');
+                }
+                toggleSidebarBtn.innerHTML = '<i class="fas fa-bars text-lg"></i>';
+            } else {
+                sidebar.classList.remove('sidebar-closed');
+                sidebar.classList.add('sidebar-open');
+                if (mainContent) {
+                    mainContent.classList.remove('ml-[80px]');
+                    mainContent.classList.add('ml-[280px]');
+                }
+                toggleSidebarBtn.innerHTML = '<i class="fas fa-times text-lg"></i>';
+            }
+        });
+    </script>
+</body>
+</html>

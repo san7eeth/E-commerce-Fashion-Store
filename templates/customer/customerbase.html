@@ -1,0 +1,170 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="{% static 'ecommerceapp/images/favicon-32x32.png' %}" type="image/png" />
+    <link href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="{% static 'ecommerceapp/css/customerstyles.css' %}">
+    <title>Fashion Shop</title>
+</head>
+<script src="https://cdn.tailwindcss.com"></script>
+<body>
+    {% include "customer/customerheader.html" %}
+    {% block body %}{% endblock body %}
+
+    <!-- ====== Hero Area ====== -->
+    <div class="header">
+        <div class="hero">
+        <div class="row container d-flex">
+            <div class="col">
+            <span class="subtitle">Limited Time Only For Winter</span>
+            <h1>fash<span class="i">i</span>on</h1>
+            <p>LOOK YOUR BEST ON YOUR BEST DAY</p>
+            <a href="{% url 'customer_shop' %}" class="btn">Explore Now!</a>
+            </div>
+            <img src="{% static 'ecommerceapp/images/woman-in-cart.png' %}" alt="Fashion Cart" />
+        </div>
+        </div>
+    </div>
+  
+    <!-- ====== Collection Section ====== -->
+    <section class="section categories">
+        <div class="title">
+            <span>COLLECTION</span>
+            <h2>Our Top Collection</h2>
+        </div>
+            
+            <div class="products container mx-auto px-4 md:px-6">
+            {% if products %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"> <!-- Fixed grid classes -->
+                {% for product in products %}
+                <a href="{% url 'product_page' product.product_id %}" 
+                class="block group bg-white rounded-xl shadow-md overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                <div class="relative h-80"> <!-- Added fixed height container -->
+                    <img src="{{ product.image.url }}" 
+                        alt="{{ product.name }}" 
+                        class="w-full h-full object-contain p-4 transition-transform duration-300 group-hover:scale-105">
+                </div>
+                <div class="p-6 text-center">
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">{{ product.brand.brand_name }}</h3>
+                    <h4 class="text-lg font-bold text-gray-900 mt-2 line-clamp-2">{{ product.name }}</h4> <!-- Added line-clamp for overflow -->
+                    <span class="text-xl font-semibold text-orange-600 mt-3 block">₹{{ product.price|floatformat:2 }}</span>
+                </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-10">
+                <p class="text-gray-500">No products available at the moment.</p>
+            </div>
+            {% endif %}
+            </div>
+        
+            {% if products %}
+            <div class="button flex justify-center mt-10">
+            <a href="{% url 'customer_shop' %}" 
+                class="btn loadmore bg-gray-800 text-white px-6 py-3 rounded-md hover:bg-gray-900 transition-colors duration-200 text-sm font-medium">
+                Load More
+            </a>
+            </div>
+            {% endif %}
+    </section>
+
+    <!-- ====== New Arrival ====== -->
+    <section class="section new-arrival">
+        <div class="title">
+            <span>NEW ARRIVAL</span>
+            <h2>Latest Collection</h2>
+        </div>
+        <div class="row container">
+            <div class="col col-1">
+                <img src="{% static 'ecommerceapp/images/poster-1.png' %}" alt="Trendy Outfit" />
+                <h3>2025 Trends <br /> Women’s Smart Skirt</h3>
+            </div>
+            <div class="col col-2">
+                <img src="{% static 'ecommerceapp/images/poster-2.png' %}" alt="Fashion Outfit" />
+                <h3>2025 Trends <br /> Women’s Smart Skirt</h3>
+            </div>
+            <div class="col col-3">
+                <img src="{% static 'ecommerceapp/images/poster-3.png' %}" alt="Smart Shirt" />
+                <h3>2025 Trends <br /> Women’s Smart Shirt <br /> <span>Discover More:</span></h3>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====== Statistics ====== -->
+    <section class="section statistics">
+        <div class="title">
+            <span>STATS</span>
+            <h2>Our Statistics</h2>
+        </div>
+        <div class="row container">
+            <div class="col">
+                <div class="icon"><i class="bx bxs-check-square"></i></div>
+                <h3>Easy Order System</h3>
+                <p>Lorem Ipsum is a placeholder text commonly used as a free text.</p>
+            </div>
+            <div class="col">
+                <div class="icon"><i class="bx bxs-user"></i></div>
+                <h3>On Time Delivery</h3>
+                <p>Lorem Ipsum is a placeholder text commonly used as a free text.</p>
+            </div>
+            <div class="col">
+                <div class="icon"><i class="bx bxs-dollar-circle"></i></div>
+                <h3>Money Back Guarantee</h3>
+                <p>Lorem Ipsum is a placeholder text commonly used as a free text.</p>
+            </div>
+            <div class="col">
+                <div class="icon"><i class="bx bxs-user"></i></div>
+                <h3>24/7 Customer Support</h3>
+                <p>Lorem Ipsum is a placeholder text commonly used as a free text.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====== Blogs ====== -->
+    <section class="section blog" id="blog-section">
+        <div class="title">
+            <span>BLOGS</span>
+            <h2>Latest News</h2>
+        </div>
+        <div class="row container">
+            <div class="col">
+                <div class="top"><img src="{% static 'ecommerceapp/images/blog-1.png' %}" alt="Blog 1" /></div>
+                <div class="bottom">
+                    <h3>Business of Fashion</h3>
+                    <h4>News and analysis from within the fashion industry.</h4>
+                    <span>10 January 2025</span>
+                </div>
+            </div>
+            <div class="col">
+                <div class="top"><img src="{% static 'ecommerceapp/images/blog-2.png' %}" alt="Blog 2" /></div>
+                <div class="bottom">
+                    <h3>College Fashion</h3>
+                    <h4>Trends, tips and styles for students.</h4>
+                    <span>10 January 2025</span>
+                </div>
+            </div>
+            <div class="col">
+                <div class="top"><img src="{% static 'ecommerceapp/images/blog-3.png' %}" alt="Blog 3" /></div>
+                <div class="bottom">
+                    <h3>Popsugar Fasion</h3>
+                    <h4>Insights into clebrity styling and inspiration fashion tips.</h4>
+                    <span>10 January 2025</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% include "customer/customerfooter.html" %}
+
+    <!-- ====== SwiperJs ====== -->
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script src="{% static 'ecommerceapp/js/main.js' %}"></script>
+    <script src="{% static 'static/ecommerceapp/js/product.js' %}"></script>
+</body>
+</html>

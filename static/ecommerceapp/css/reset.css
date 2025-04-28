@@ -1,0 +1,107 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
+
+/* Centering the reset container */
+.reset-container {
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.95); /* Slight transparency */
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    text-align: center;
+}
+
+/* Close button */
+.close-btn {
+    background: transparent;
+    border: none;
+    font-size: 22px;
+    color: #333;
+    cursor: pointer;
+    position: absolute;
+    right: 15px;
+    top: 15px;
+}
+
+.close-btn:hover {
+    color: #df1d2f;
+}
+
+/* Reset title */
+.reset-title {
+    color: #df1d2f;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+/* Reset description */
+.reset-description {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+/* Input fields */
+.reset-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+.reset-input:focus {
+    border-color: #df1d2f;
+    box-shadow: 0 0 5px rgba(223, 29, 47, 0.4);
+    outline: none;
+}
+
+/* Reset button */
+.reset-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #df1d2f;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.reset-btn:hover {
+    background-color: #bb1828;
+    box-shadow: 0 4px 10px rgba(223, 29, 47, 0.3);
+}
+
+/* Back link */
+.back-link {
+    display: block;
+    margin-top: 15px;
+    color: #007bff;
+    font-size: 14px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+    color: #0056b3;
+}
+
+/* Responsive Design */
+@media (max-width: 500px) {
+    .reset-container {
+        width: 90%;
+        padding: 20px;
+    }
+}

@@ -1,0 +1,85 @@
+/* about us */
+.about-us {
+    padding: 50px 20px; /* Padding for the section */
+    background: #ffffff; /* Solid white background for the about section */
+    border-radius : 10px; /* Rounded corners */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    max-width: 1200px; /* Max width for the section */
+    margin: auto; /* Center the section */
+    position: relative; /* Ensure it doesn't overlap with the header */
+    z-index: 1; /* Lower z-index than header */
+  }
+  
+  .about-us h1 {
+    font-size: 36px; /* Larger font size for the main heading */
+    margin-bottom: 20px; /* Space below the heading */
+    text-align: center; /* Center the heading */
+    color: #ef2a2a; /* Dark color for the heading */
+  }
+  
+  .about-us h2 {
+    font-size: 28px; /* Font size for subheadings */
+    margin-top: 30px; /* Space above subheadings */
+    margin-bottom: 10px; /* Space below subheadings */
+    color: #fe5051; /* Color for subheadings */
+  }
+  
+  .about-us p {
+    font-size: 16px; /* Font size for paragraphs */
+    line-height: 1.6; /* Line height for better readability */
+    margin-bottom: 20px; /* Space below paragraphs */
+    color: #333; /* Dark gray color for text */
+  }
+  
+  .team {
+    display: flex; /* Flexbox for team members */
+    justify-content: space-around; /* Space between team members */
+    flex-wrap: wrap; /* Wrap to next line on smaller screens */
+    margin-top: 30px; /* Space above team section */
+  }
+  
+  .team-member {
+    background: #ffffff; /* Solid white background for team members */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    text-align: center; /* Center text */
+    margin: 10px; /* Margin around team members */
+    padding: 20px; /* Padding inside team member boxes */
+    transition: transform 0.3s; /* Smooth transform on hover */
+    width: 250px; /* Fixed width for team member boxes */
+  }
+  
+  .team-member:hover {
+    transform: translateY(-5px); /* Lift effect on hover */
+  }
+  
+  .team-member img {
+    width: 100%; /* Full width for images */
+    border-radius: 50%; /* Circular images */
+    margin-bottom: 15px; /* Space below images */
+  }
+  
+  .team-member h3 {
+    font-size: 20px; /* Font size for team member names */
+    margin: 10px 0; /* Space above and below names */
+    color: #0e263d; /* Dark color for names */
+  }
+  
+  .team-member p {
+    font-size: 14px; /* Font size for team member roles and descriptions */
+    color: #666; /* Gray color for roles and descriptions */
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .team {
+        flex-direction: column; /* Stack team members vertically on small screens */
+        align-items: center; /* Center team members */
+    }
+  
+    .team-member {
+        width: 80%; /* Full width for team members on small screens */
+    }
+  }
+  
+  

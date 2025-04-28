@@ -1,0 +1,202 @@
+{% load static math_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Invoice - Order {{ order.order_id }}</title>
+  <link rel="stylesheet" href="{% static 'ecommerceapp/css/styles.css' %}">
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .invoice-page {
+      background-color: #f4f6f9;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    .a4-paper {
+      background-color: white;
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 30px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+      border-radius: 10px;
+    }
+    .table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .img-fluid {
+      object-fit: contain;
+      max-height: 50px;
+    }
+    .working-btn {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .working-btn button {
+      background-color: #3b82f6;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      margin: 0 10px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    .working-btn button:hover {
+      background-color: #2563eb;
+    }
+    .invoice-title {
+      font-size: 2.2em;
+      color: #bd3673;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5em;
+    }
+    .invoice-meta {
+      background-color: #f1f1f1;
+      border-left: 4px solid #bd3673;
+      padding: 10px 20px;
+      border-radius: 8px;
+      margin-bottom: 25px;
+      font-size: 1em;
+      color: #555;
+    }
+    .invoice-meta p {
+      margin: 4px 0;
+    }
+  </style>
+</head>
+<body>
+  {% include "customer/customerheader.html" %}
+
+  <div class="invoice-page">
+    <div class="a4-paper" id="container_content">
+      <div class="row" style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="col-md-4">
+          <img src="{% static 'ecommerceapp/images/logo.svg' %}" alt="Logo" style="max-height: 60px;">
+        </div>
+        <div class="col-md-8" style="text-align: right;">
+          <h1 class="invoice-title">
+            <i class="fas fa-file-invoice"></i> Invoice
+          </h1>
+        </div>
+      </div>
+
+      <div class="invoice-meta">
+        <p><strong>Order ID:</strong> {{ order.order_id }}</p>
+        <p><strong>Order Date:</strong> {{ order.created_at|date:"Y-m-d" }}</p>
+        {% if order.status == 'delivered' and order.delivered_at %}
+          <p><strong>Delivered Date:</strong> {{ order.delivered_at|date:"Y-m-d" }}</p>
+        {% else %}
+          <p><strong>Delivered Date:</strong> Not yet delivered</p>
+        {% endif %}
+      </div>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th style="background-color: #f4f6f9; font-size: 1.6em;">Product</th>
+            <th style="background-color: #f4f6f9; font-size: 1.6em;">Price</th>
+            <th style="background-color: #f4f6f9; font-size: 1.6em;">Quantity</th>
+            <th style="background-color: #f4f6f9; font-size: 1.6em;">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in order_items %}
+          <tr>
+            <td>
+              <div class="row" style="align-items: center;">
+                <div class="col-3 d-flex align-items-center justify-content-center">
+                  <img class="img-fluid" src="{{ item.product.image.url|default:'/static/default.jpg' }}" alt="{{ item.product.name }}">
+                </div>
+                <div class="col">
+                  <div style="font-size: 1.2em;" class="row text-muted">{{ item.product.name }}</div>
+                </div>
+              </div>
+            </td>
+            <td style="font-size: 1.2em;">₹ {{ item.price|floatformat:2 }}</td>
+            <td>
+              <div class="col d-flex align-items-center justify-content-center">
+                <span class="invoice-item-price">{{ item.quantity }}</span>
+              </div>
+            </td>
+            <td style="font-size: 1.2em;">₹ {{ item.price|multiply:item.quantity|floatformat:2 }}</td>
+          </tr>
+          {% endfor %}
+          <tr>
+            <td colspan="3" style="text-align: right; font-size: 1.2em;">Subtotal</td>
+            <td style="font-size: 1.2em;">₹ {{ order.total_amount|floatformat:2 }}</td>
+          </tr>
+          <tr>
+            <td colspan="3" style="text-align: right; font-size: 1.2em;">Tax (0%)</td>
+            <td style="font-size: 1.2em;">0</td>
+          </tr>
+          <tr>
+            <td colspan="3" style="text-align: right; font-size: 1.2em;">Shipping (Free)</td>
+            <td style="font-size: 1.2em;">0</td>
+          </tr>
+          <tr>
+            <td colspan="3" style="text-align: right; font-weight: bold; font-size: 1.2em;">Grand Total</td>
+            <td style="font-size: 1.2em; font-weight: bold;">₹ {{ order.total_amount|floatformat:2 }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <br><br>
+      <div class="row">
+        <div class="col-md-4" style="text-align: left;">
+          <h1>Invoice Information</h1>
+          <p style="font-size: 1.2em;">
+            Issued To: {{ customer.name|title }} <br>
+            Address: {{ order.delivery_address }} <br>
+            Payment Method: {{ order.payment_method|title }}
+          </p>
+        </div>
+        <div class="col-md-8" style="text-align: right;">
+          <h1>Total Amount</h1>
+          <p style="font-size: 1.2em;">₹ {{ order.total_amount|floatformat:2 }}</p>
+        </div>
+      </div>
+      <br><hr>
+      <span style="font-size: 1.4em;">Hey <span style="color: #6e6e6e;">{{ customer.name|title }}</span>, Thanks for Shopping with Us!</span>
+    </div>
+
+    <div class="col-md-12 working-btn">
+      <button type="button" id="rep" class="btn_print">Download Invoice</button>
+      <a href="{% url 'customeraccount' %}"><button>Back to Account</button></a>
+    </div>
+  </div>
+
+  {% include "customer/customerfooter.html" %}
+
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+  <script type="text/javascript">
+    $(document).on('click', '.btn_print', function(event) {
+      event.preventDefault();
+      var element = document.getElementById('container_content');
+      var opt = {
+        margin: 0.5,
+        filename: 'Invoice_' + '{{ order.order_id }}' + '.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
+    });
+  </script>
+</body>
+</html>

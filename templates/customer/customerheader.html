@@ -1,0 +1,177 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fashion Shop</title>
+
+  <!-- ====== Favicon ====== -->
+  <link rel="shortcut icon" href="{% static 'ecommerceapp/images/favicon-32x32.png' %}" type="image/png" />
+
+  <!-- ====== Boxicons ====== -->
+  <link href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css" rel="stylesheet" />
+
+  <!-- ====== Swiper CSS ====== -->
+  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+
+  <!-- ====== Custom CSS ====== -->
+  <link rel="stylesheet" href="{% static 'ecommerceapp/css/customerstyles.css' %}">
+  <link rel="stylesheet" href="{% static 'ecommerceapp/css/product.css' %}">
+
+</head>
+
+<body>
+  <!-- ====== Header ====== -->
+  <header class="header">
+    <nav class="navbar">
+      <div class="row container d-flex">
+        <!-- Logo -->
+        <div class="logo">
+          <img src="{% static 'ecommerceapp/images/logo.svg' %}" alt="Logo" />
+        </div>
+
+        <!-- Navigation Links -->
+        <div class="nav-list d-flex">
+          <a href="{% url 'customerhome' %}">Home</a>
+          <a href="{% url 'customer_shop' %}">Shop</a>
+          <a href="{% url 'customer_aboutus' %}">About Us</a>
+          <a href="{% url 'customerhome' %}#blog-section" id="blog-link">Blog</a>
+          <a href="{% url 'customer_contactus' %}">ContactUs</a>
+          
+          <!-- Close Button for Mobile -->
+          <div class="close">
+            <i class="bx bx-x"></i>
+          </div>
+        </div>
+
+        <!-- Icons Section -->
+        <div class="icons d-flex">
+          <!-- Search Bar -->
+          <div class="icon d-flex" id="search-icon">
+            <i class="bx bx-search"></i>
+          </div>
+
+          <script>
+            document.getElementById("search-icon").addEventListener("click", function () {
+              window.location.href = "{% url 'customer_shop' %}";
+            });
+          </script>
+
+          <!-- Cart -->
+          <div class="icon d-flex" id="cart-icon">
+            <a href="{% url 'customer_cart' %}">
+              <i class="bx bx-cart"></i>
+            </a>
+          </div>
+
+          
+          <!-- User Icon and Username -->
+            <div class="icon user-icon d-flex">
+              {% if request.user.is_authenticated %}
+                <div class="user-dropdown">
+                  <!-- Dropdown Toggle -->
+                  <a href="#" class="dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+                    <i class="bx bx-user"></i>
+                  </a>
+                  
+                  <!-- Dropdown Menu -->
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a href="{% url 'customeraccount' %}">Account</a>
+                    <a href="{% url 'logout' %}">Logout</a>
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- Username -->
+            <span class="username">{{ customer.name | default:"customer not found"}}</span>
+
+
+        <!-- Hamburger Menu for Mobile -->
+        <div class="hamburger">
+          <i class="bx bx-menu-alt-right"></i>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Internal JavaScript for Dropdown -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // Dropdown Menu Logic
+      const dropdownToggle = document.querySelector(".user-dropdown .dropdown-toggle");
+      const dropdownMenu = document.querySelector(".user-dropdown .dropdown-menu");
+  
+      if (dropdownToggle && dropdownMenu) {
+        dropdownToggle.addEventListener("click", function (e) {
+          e.preventDefault();
+          dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
+        });
+  
+        document.addEventListener("click", function (e) {
+          if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+            dropdownMenu.style.display = "none";
+          }
+        });
+      }
+  
+      // Custom Smooth Scroll Function
+      function smoothScroll(target, duration) {
+        const start = window.pageYOffset;
+        const distance = target - start;
+        let startTime = null;
+  
+        // Easing function: easeInOutQuad
+        function ease(t, b, c, d) {
+          t /= d / 2;
+          if (t < 1) return (c / 2) * t * t + b;
+          t--;
+          return (-c / 2) * (t * (t - 2) - 1) + b;
+        }
+  
+        function animation(currentTime) {
+          if (startTime === null) startTime = currentTime;
+          const timeElapsed = currentTime - startTime;
+          const run = ease(timeElapsed, start, distance, duration);
+          window.scrollTo(0, run);
+          if (timeElapsed < duration) requestAnimationFrame(animation);
+        }
+  
+        // Start animation only if there's a distance to scroll
+        if (distance !== 0) {
+          requestAnimationFrame(animation);
+        }
+      }
+  
+      // Blog Link Smooth Scroll Logic
+      const blogLink = document.getElementById("blog-link");
+      if (blogLink) {
+        blogLink.addEventListener("click", function (e) {
+          const isHomePage = window.location.pathname === "{% url 'customerhome' %}";
+          const blogSection = document.getElementById("blog-section");
+  
+          if (isHomePage && blogSection) {
+            e.preventDefault();
+            const targetPosition = blogSection.getBoundingClientRect().top + window.pageYOffset;
+            smoothScroll(targetPosition, 1500); // 1.5s duration
+          }
+          // If not on customerhome, href redirects to customerhome#blog-section
+        });
+      }
+  
+      // Scroll on Page Load if Hash is Present
+      if (window.location.hash === "#blog-section") {
+        const blogSection = document.getElementById("blog-section");
+        if (blogSection) {
+          setTimeout(() => {
+            const targetPosition = blogSection.getBoundingClientRect().top + window.pageYOffset;
+            smoothScroll(targetPosition, 1500); // 1.5s duration
+          }, 100);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

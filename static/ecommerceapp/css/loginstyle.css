@@ -1,0 +1,291 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevent scrolling */
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background: #f6f5f7;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: -20px 0 50px;
+    margin-top: 20px;
+}
+
+h1 {
+    font-weight: bold;
+    margin: 0;
+}
+
+p {
+    font-size: 14px;
+    font-weight: 100;
+    line-height: 20px;
+    letter-spacing: .5px;
+    margin: 20px 0 30px;
+}
+
+span {
+    font-size: 12px;
+}
+
+a {
+    color: #df1d2f;
+    font-size: 14px;
+    text-decoration: none;
+    margin: 15px 0;
+}
+
+.container {
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, .2), 0 10px 10px rgba(0, 0, 0, .2);
+    position: relative;
+    overflow: hidden;
+    width: 768px;
+    max-width: 100%;
+    min-height: 480px;
+    display: flex;
+}
+
+.form-container form {
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    padding: 0 50px;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%; /* Ensure form takes full container width */
+}
+
+.social-container {
+    margin: 20px 0;
+}
+
+.social-container a {
+    border: 1px solid #df1d2f;
+    border-radius: 50%;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 5px;
+    height: 40px;
+    width: 40px;
+    color: #df1d2f;
+}
+
+/* Form Group Styling */
+.form-group {
+    width: 100%;
+    margin: 8px 0;
+    position: relative;
+    text-align: left;
+}
+
+/* Input Styling */
+.form-container input {
+    background: #eeeeee;
+    border: none;
+    padding: 10px 12px;
+    width: 100%;
+    max-width: 280px;
+    font-size: 13px;
+    border-radius: 5px;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+    margin-bottom: 12px;
+    height: 40px; /* Ensure uniform height for all inputs */
+    display: block; /* Ensure inputs take full width of container */
+}
+
+/* Error Message Styling */
+.error-message {
+    color: #ff4757;
+    font-size: 12px;
+    margin-top: 5px;
+    text-align: left;
+    width: 100%;
+    display: none;
+}
+
+/* Email and Password Containers */
+.email-container,
+.password-container {
+    position: relative;
+    width: 100%;
+    max-width: 280px;
+    margin-bottom: 12px;
+}
+
+.password-container input {
+    width: 100%;
+    padding-right: 36px; /* Increased to accommodate toggle icon */
+    height: 40px; /* Match other inputs */
+}
+
+.password-container i {
+    position: absolute;
+    right: 12px; /* Adjusted for better spacing */
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #df1d2f;
+    font-size: 14px;
+    z-index: 1; /* Ensure icon stays above input */
+}
+
+/* Button Styling */
+button {
+    border-radius: 20px;
+    border: 1px solid #df1d2f;
+    background: #df1d2f;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 12px 45px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: transform 80ms ease-in;
+    margin-top: 10px;
+    width: 100%; /* Full width buttons */
+    max-width: 300px; /* Match input width */
+}
+
+button:active {
+    transform: scale(.95);
+}
+
+button:focus {
+    outline: none;
+}
+
+button.ghost {
+    background: transparent;
+    border-color: #fff;
+}
+
+/* Form Container Positioning */
+.form-container form {
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 30px;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    gap: 8px; /* Consistent spacing between form groups */
+}
+
+.sign-in-container {
+    left: 0;
+    z-index: 2;
+}
+
+.sign-up-container {
+    left: 0;
+    z-index: 1;
+    opacity: 0;
+}
+
+/* Overlay Styling */
+.overlay-container {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    transition: transform .6s ease-in-out;
+    z-index: 100;
+}
+
+.overlay {
+    background: #df1d2f;
+    background: linear-gradient(to right, #df1d2f, #df1d2f) no-repeat 0 0 / cover;
+    color: #fff;
+    position: relative;
+    left: -100%;
+    height: 100%;
+    width: 200%;
+    transform: translateY(0);
+    transition: transform .6s ease-in-out;
+}
+
+.overlay-panel {
+    position: absolute;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0 40px;
+    height: 100%;
+    width: 50%;
+    text-align: center;
+    transform: translateY(0);
+    transition: transform .6s ease-in-out;
+}
+
+.overlay-right {
+    right: 0;
+    transform: translateY(0);
+}
+
+.overlay-left {
+    transform: translateY(-20%);
+}
+
+/* Animation for Right Panel */
+.container.right-panel-active .sign-in-container {
+    transform: translateY(100%);
+}
+
+.container.right-panel-active .overlay-container {
+    transform: translateX(-100%);
+}
+
+.container.right-panel-active .sign-up-container {
+    transform: translateX(100%);
+    opacity: 1;
+    z-index: 5;
+}
+
+.container.right-panel-active .overlay {
+    transform: translateX(50%);
+}
+
+.container.right-panel-active .overlay-left {
+    transform: translateY(0);
+}
+
+.container.right-panel-active .overlay-right {
+    transform: translateY(20%);
+}
+
+/* Close Icon */
+.close-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 1000;
+    color: #df1d2f; /* Make it visible against white background */
+}

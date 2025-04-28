@@ -1,0 +1,237 @@
+{% load static %}
+{% include "customer/customerheader.html" %}
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>{{ product.name }}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet"/>
+    <style>
+        .selected-size { border: 2px solid #000; background: #f0f0f0; }
+        .hidden { display: none; }
+        .out-of-stock { color: red; font-weight: bold; margin-top: 10px; }
+        .add-to-cart.disabled {
+            background-color: #d3d3d3;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+    </style>
+    <script>
+        function selectSize(element, sizeText) {
+            document.querySelectorAll('.size-option').forEach(option => {
+                option.classList.remove('selected-size');
+            });
+            element.classList.add('selected-size');
+            document.getElementById('size-label').textContent = sizeText;
+        }
+
+        function toggleDetails() {
+            const details = document.getElementById('extra-details');
+            const toggleButton = document.getElementById('toggle-button');
+            if (details.classList.contains('hidden')) {
+                details.classList.remove('hidden');
+                toggleButton.innerText = '- Less';
+            } else {
+                details.classList.add('hidden');
+                toggleButton.innerText = '+ More';
+            }
+        }
+
+        function addToCart(productId) {
+            // Prevent adding to cart if out of stock
+            if (!{{ product.stock_available|yesno:"true,false" }}) {
+                alert("This product is currently out of stock.");
+                return;
+            }
+
+            const size = document.getElementById('size-label').textContent;
+            const quantity = 1;
+
+            if (!size || size === "No sizes available") {
+                alert("Please select a size first");
+                return;
+            }
+
+            fetch('{% url "add_to_cart" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    size: size,
+                    quantity: quantity
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                } else {
+                    alert(data.error);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    
+        function addToWishlist(productId) {
+            const size = document.getElementById('size-label').textContent;
+            
+            if (!productId || productId === 'MISSING_ID') {
+                alert("Invalid product ID");
+                return;
+            }
+            if (!size || size === "No sizes available") {
+                alert("Please select a size first");
+                return;
+            }
+        
+            const formData = new FormData();
+            formData.append('product_id', productId);
+            formData.append('size', size);
+        
+            fetch('{% url "add_to_wishlist" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) alert(data.message);
+                else if (data.error) alert(data.error);
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Failed to add to wishlist");
+            });
+        }
+    </script>
+</head>
+<body>
+    <main class="product-container">
+        <div class="product-detail-container">
+            <div class="product-image-container">
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image"/>
+            </div>
+            <div class="product-info-container">
+                <h2 class="brand-name">{{ product.brand.brand_name }}</h2>
+                <h1 class="product-title">{{ product.name }}</h1>
+                <div class="price-container">
+                    <span class="discounted-price text-orange-600 font-bold">₹{{ product.discount_price }}</span>
+                    {% if product.discount_percentage > 0 %}
+                        <span class="discount-badge bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm font-semibold">
+                            {{ product.discount_percentage }}% OFF
+                        </span>
+                    {% endif %}
+                </div>
+                <span class="original-price line-through text-gray-500">₹{{ product.price }}</span>
+                
+                <div class="color-selector">
+                    <span>Color:</span>
+                    <span>{{ product.color }}</span>
+                </div>
+                <div class="size-selector">
+                    <p>Size:</p>
+                    <p id="size-label">
+                        {% if available_sizes %}
+                            {% with first_size=available_sizes|first %}
+                                {{ first_size|default:"N/A" }}
+                            {% endwith %}
+                        {% else %}
+                            No sizes available
+                        {% endif %}
+                    </p>
+                    <div class="size-options">
+                        {% for size in available_sizes %}
+                            <div class="size-option {% if forloop.first %}selected-size{% endif %}" 
+                                 onclick="selectSize(this, '{{ size }}')">
+                                <span>{{ size }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% if not product.stock_available %}
+                    <p class="out-of-stock">Currently Out of Stock</p>
+                {% endif %}
+                <div class="action-buttons">
+                    <button class="add-to-cart {% if not product.stock_available %}disabled{% endif %}" 
+                            onclick="addToCart('{{ product.product_id }}')"
+                            {% if not product.stock_available %}disabled{% endif %}>
+                        <i class="fas fa-shopping-cart"></i> Add to Bag
+                    </button>
+                    <button class="wishlist" onclick="addToWishlist('{{ product.product_id }}')">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="details-section">
+            <h2>Product Details</h2>
+            <div class="details-content">
+                <div class="basic-details">
+                    <p><span>Product Name:</span> {{ product.name }}</p>
+                    <p><span>Product Code:</span> {{ product.product_code }}</p>
+                    <p><span>Category:</span> {{ product.category }}</p>
+                    <p><span>Description:</span> {{ product.description }}</p>
+                    <p><span>Material:</span> {{ product.material }}</p>
+                </div>
+                <div id="extra-details" class="hidden">
+                    <p><span>Package Contains:</span> {{ product.package_contains }}</p>
+                    <p><span>Marketed By:</span> {{ product.marketed_by }}</p>
+                    <p><span>Imported By:</span> {{ product.imported_by }}</p>
+                    <p><span>Country of Origin:</span> {{ product.country_of_origin }}</p>
+                    <p><span>Net Quantity:</span> {{ product.net_quantity }}</p>
+                    <p><span>Customer Care Address:</span> {{ product.customer_care_address }}</p>
+                    <p><span>Commodity:</span> {{ product.commodity }}</p>
+                </div>
+            </div>
+            <button id="toggle-button" class="mt-4 text-orange-500 font-bold" onclick="toggleDetails()">+ More</button>
+        </div>
+
+        <!-- Reviews Section -->
+        <div class="reviews-section">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Customer Ratings & Reviews</h2>
+            {% if reviews %}
+                <div class="reviews-container">
+                    {% for review in reviews %}
+                        <div class="review">
+                            <div class="rating">
+                                <div class="stars">
+                                    {% for i in "12345"|make_list %}
+                                        <i class="fas fa-star {% if forloop.counter > review.rating %}grey{% endif %}"></i>
+                                    {% endfor %}
+                                </div>
+                                <span>{{ review.rating|floatformat:1 }}</span>
+                            </div>
+                            <p class="review-text">"{{ review.comment|default:'No comment' }}"</p>
+                            <p class="review-author">- {{ review.customer.name|title }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-gray-600">No reviews yet for this product.</p>
+            {% endif %}
+        </div>
+
+        <div class="similar-products">
+            <h2>Similar Products</h2>
+            <div class="products-grid">
+                {% for similar_product in similar_products %}
+                    <a href="{% url 'product_page' similar_product.product_id %}" class="product-card">
+                        <img src="{{ similar_product.image.url }}" alt="{{ similar_product.name }}">
+                        <h3>{{ similar_product.name }}</h3>
+                        <p>{{ similar_product.price }}Rs</p>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </main>
+
+    {% include "customer/customerfooter.html" %}
+</body>
+</html>

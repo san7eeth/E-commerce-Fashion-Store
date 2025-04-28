@@ -1,0 +1,332 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - Brand Account Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif;
+            background-color: white;
+        }
+        .fade-in { 
+            animation: fadeIn 0.3s ease-in; 
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px -5px rgba(0, 0, 0, 0.07), 0 8px 8px -5px rgba(0, 0, 0, 0.03);
+        }
+    </style>
+</head>
+<body class="bg-white">
+    <div class="flex min-h-screen">
+        {% include "brand/sidebar.html" %}
+
+        <!-- Main Content -->
+        <div class="flex-1 p-4 lg:p-6">
+            <header class="mb-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-4">
+                        <h1 class="text-xl font-bold text-gray-900">Products</h1>
+                    </div>
+                    <div class="flex flex-wrap sm:flex-nowrap gap-2">
+                        <button onclick="document.getElementById('uploadModal').classList.remove('hidden')"
+                                class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                            <i class="fas fa-plus mr-1.5"></i> New Product
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Messages -->
+            {% if messages %}
+                <div class="mb-4 space-y-1.5">
+                    {% for message in messages %}
+                        <div class="p-3 rounded-lg fade-in text-sm {% if message.tags == 'success' %}bg-green-50 text-green-800{% elif message.tags == 'error' %}bg-red-50 text-red-800{% else %}bg-blue-50 text-blue-800{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Product Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {% if products %}
+                    {% for product in products %}
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 h-72 flex flex-col card-hover">
+                            <div class="relative h-44">
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}"
+                                    class="w-full h-full object-contain object-center"/>
+                                {% if not product.is_visible %}
+                                    <div class="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded">Hidden</div>
+                                {% endif %}
+                                {% if product.category %}
+                                    <div class="absolute bottom-2 left-2 bg-gray-800 bg-opacity-70 text-white text-xs px-2 py-0.5 rounded">
+                                        {{ product.category.name }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="flex-1 p-3">
+                                <p class="text-sm font-medium text-gray-900 truncate mb-1">{{ product.name }}</p>
+                                <p class="text-xs text-gray-500 mb-2">
+                                    Status: <span class="{% if product.is_visible %}text-green-600{% else %}text-red-600{% endif %}">
+                                        {{ product.is_visible|yesno:"Visible,Hidden" }}
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="flex border-t border-gray-100">
+                                <a href="{% url 'edit_product' product.product_id %}"
+                                   class="flex-1 py-2 text-xs font-medium text-center text-blue-600 hover:bg-blue-50 transition-colors">
+                                    <i class="fas fa-edit mr-1"></i> Edit
+                                </a>
+                                <div class="w-px bg-gray-100"></div>
+                                <button onclick="deleteProduct('{{ product.product_id }}', '{% url 'delete_product' product.product_id %}')"
+                                        class="flex-1 py-2 text-xs font-medium text-center text-red-600 hover:bg-red-50 transition-colors">
+                                    <i class="fas fa-trash mr-1"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-span-full p-8 text-center bg-gray-50 rounded-lg">
+                        <div class="flex flex-col items-center">
+                            <i class="fas fa-box-open text-gray-300 text-4xl mb-3"></i>
+                            <p class="text-gray-500 text-sm">No products found.</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Upload Modal -->
+            <div class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 hidden" id="uploadModal">
+                <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl mx-4 max-h-[80vh] overflow-y-auto">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-bold text-gray-900">New Product</h2>
+                        <button onclick="document.getElementById('uploadModal').classList.add('hidden')" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="grid grid-cols-2 gap-6">
+                            <!-- Basic Information -->
+                            <div>
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Product Name</label>
+                                <input type="text" name="name" class="w-full p-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Category</label>
+                                <select name="category" class="w-full p-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                    {% for category in categories %}
+                                        <option value="{{ category.id }}">{{ category.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Price</label>
+                                <input type="number" name="price" class="w-full p-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" step="0.01" required>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Discount Price</label>
+                                <input type="number" name="discount_price" class="w-full p-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" step="0.01">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Color</label>
+                                <input type="text" name="color" class="w-full p-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Description</label>
+                                <textarea name="description" class="w-full p-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" rows="4"></textarea>
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Material</label>
+                                <input type="text" name="material" class="w-full p-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            
+                            <!-- Product Image -->
+                            <div class="col-span-2">
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Product Image</label>
+                                <input type="file" name="image" class="w-full p-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                            
+                            <!-- Size Information -->
+                            <div class="col-span-2">
+                                <label class="block text-gray-700 text-sm font-medium mb-2" for="size_type">Select Size Type</label>
+                                <select name="size_type" id="size_type" class="w-full p-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="alphabet">Alphabetic (XS-XXL)</option>
+                                    <option value="numeric">Numeric (28-36)</option>
+                                </select>
+                            </div>
+                            <div id="alphabet_sizes" class="col-span-2 hidden">
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Select Sizes</label>
+                                <div class="grid grid-cols-3 gap-2">
+                                    {% for size in alphabet_sizes %}
+                                        <div class="flex items-center">
+                                            <input type="checkbox" name="sizes" value="{{ size }}" class="mr-2 h-4 w-4"> 
+                                            <span class="text-gray-700 text-sm">{{ size }}</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div id="numeric_sizes" class="col-span-2">
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Select Sizes</label>
+                                <div class="grid grid-cols-3 gap-2">
+                                    {% for size in numeric_sizes %}
+                                        <div class="flex items-center">
+                                            <input type="checkbox" name="sizes" value="{{ size }}" class="mr-2 h-4 w-4"> 
+                                            <span class="text-gray-700 text-sm">{{ size }}</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Product Details -->
+                            <div class="col-span-2">
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Package Contains</label>
+                                <input type="text" name="package_contains" class="w-full p-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Marketed By</label>
+                                <input type="text" name="marketed_by" class="w-full p-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Imported By</label>
+                                <input type="text" name="imported_by" class="w-full p-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Country of Origin</label>
+                                <input type="text" name="country_of_origin" class="w-full p-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Net Quantity</label>
+                                <input type="text" name="net_quantity" class="w-full p-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Customer Care Address</label>
+                                <textarea name="customer_care_address" class="w-full p-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" rows="2"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Commodity</label>
+                                <input type="text" name="commodity" class="w-full p-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            
+                            <!-- Availability Settings -->
+                            <div class="col-span-2">
+                                <label class="block text-gray-700 text-sm font-medium mb-2" for="stock">Stock Available</label>
+                                <select name="stock_available" id="stock" class="w-full p-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="yes">Yes</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Visibility</label>
+                                <div class="flex gap-4">
+                                    <label class="flex items-center">
+                                        <input type="radio" name="is_visible" value="yes" class="mr-2 h-4 w-4" checked>
+                                        <span class="text-gray-700 text-sm">Visible</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="radio" name="is_visible" value="no" class="mr-2 h-4 w-4">
+                                        <span class="text-gray-700 text-sm">Hidden</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-end gap-3 mt-4">
+                            <button type="button"
+                                    onclick="document.getElementById('uploadModal').classList.add('hidden')"
+                                    class="bg-gray-200 text-gray-700 px-4 py-2 text-sm rounded-lg hover:bg-gray-300 transition">
+                                Cancel
+                            </button>
+                            <button type="submit"
+                                    class="bg-blue-600 text-white px-4 py-2 text-sm rounded-lg hover:bg-blue-700 transition">
+                                Upload
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("size_type").addEventListener("change", function() {
+            let type = this.value;
+            document.getElementById("alphabet_sizes").style.display = type === "alphabet" ? "block" : "none";
+            document.getElementById("numeric_sizes").style.display = type === "numeric" ? "block" : "none";
+        });
+        document.getElementById("size_type").dispatchEvent(new Event("change"));
+
+        document.addEventListener("DOMContentLoaded", function () {
+            {% if messages %}
+                {% for message in messages %}
+                    Swal.fire({
+                        title: "{% if message.tags == 'success' %}Success!{% elif message.tags == 'error' %}Error!{% else %}Info{% endif %}",
+                        text: "{{ message }}",
+                        icon: "{{ message.tags }}",
+                        confirmButtonColor: "#3085d6",
+                        confirmButtonText: "OK"
+                    });
+                {% endfor %}
+            {% endif %}
+        });
+
+        function deleteProduct(productId, deleteUrl) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(deleteUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.message) {
+                            Swal.fire({
+                                title: "Deleted!",
+                                text: data.message,
+                                icon: "success",
+                                confirmButtonColor: "#3085d6"
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                title: "Error!",
+                                text: data.error,
+                                icon: "error",
+                                confirmButtonColor: "#3085d6"
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            title: "Error!",
+                            text: "An error occurred while deleting the product.",
+                            icon: "error",
+                            confirmButtonColor: "#3085d6"
+                        });
+                    });
+                }
+            });
+        }
+    </script>

@@ -1,0 +1,53 @@
+{% load static %}
+<!-- Sidebar -->
+<script src="https://cdn.tailwindcss.com"></script>
+<div class="fixed h-screen bg-white w-64 p-6 shadow-md flex flex-col">
+    <!-- Brand Info -->
+    <div class="flex items-center space-x-4">
+        {% if brand.logo %}
+            <img src="{{ brand.logo.url }}" alt="Brand Logo" class="w-12 h-12 rounded-full border shadow-md">
+        {% else %}
+            <img src="{% static 'images/default-logo.png' %}" alt="Brand Logo Placeholder" class="w-12 h-12 rounded-full border shadow-md">
+        {% endif %}
+        <span class="text-xl font-semibold">
+            {{ brand.brand_name }}
+        </span>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="mt-10 flex-1 overflow-y-auto">
+        <a class="flex items-center p-2 text-gray-700 hover:bg-gray-200 rounded-md" href="{% url 'brandhome' %}">
+            <i class="fas fa-tachometer-alt w-6"></i>
+            <span class="ml-3">Dashboard</span>
+        </a>
+        <a class="flex items-center p-2 mt-2 text-gray-700 hover:bg-gray-200 rounded-md" href="{% url 'brand_orders' %}">
+            <i class="fas fa-box w-6"></i>
+            <span class="ml-3">Orders</span>
+        </a>
+        <a class="flex items-center p-2 mt-2 text-gray-700 hover:bg-gray-200 rounded-md" href="{% url 'brand_products' %}">
+            <i class="fas fa-cube w-6"></i>
+            <span class="ml-3">Products</span>
+        </a>
+        <a class="flex items-center p-2 mt-2 text-gray-700 hover:bg-gray-200 rounded-md" href="{% url 'brand_reviews' %}">
+            <i class="fas fa-star w-6"></i>
+            <span class="ml-3">Reviews</span>
+        </a>
+        <a class="flex items-center p-2 mt-2 text-gray-700 hover:bg-gray-200 rounded-md" href="{% url 'brand_account' %}">
+            <i class="fas fa-user w-6"></i>
+            <span class="ml-3">My Account</span>
+        </a>
+    </nav>
+
+    <!-- Logout at bottom -->
+    <div class="mt-auto">
+        <a class="flex items-center p-2 text-gray-700 hover:bg-gray-200 rounded-md" href="{% url 'logout' %}">
+            <i class="fas fa-sign-out-alt w-6"></i>
+            <span class="ml-3">Logout</span>
+        </a>
+    </div>
+</div>
+
+<!-- Main Content - Add this after your sidebar -->
+<div class="ml-60 p-6">
+    <!-- Your main content goes here -->
+</div>

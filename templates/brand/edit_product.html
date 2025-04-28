@@ -1,0 +1,274 @@
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Product - {{ product.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: #f2f4f7;
+            min-height: 100vh;
+        }
+        .form-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .section-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    {% include "brand/sidebar.html" %}
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container-fluid">
+            <h1 class="mb-4">Edit Product</h1>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- Basic Information Section -->
+                        <div class="form-section">
+                            <h5 class="section-title">Basic Information</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="name" class="form-label">Product Name</label>
+                                        <input type="text" name="name" id="name" class="form-control" value="{{ product.name }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="product_code" class="form-label">Product Code</label>
+                                        <input type="text" name="product_code" id="product_code" class="form-control" value="{{ product.product_code }}">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="category" class="form-label">Category</label>
+                                        <select name="category" id="category" class="form-select" required>
+                                            {% for category in categories %}
+                                                <option value="{{ category.id }}" {% if category.id == product.category.id %}selected{% endif %}>
+                                                    {{ category.name }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="price" class="form-label">Price</label>
+                                        <input type="number" step="0.01" name="price" id="price" class="form-control" value="{{ product.price }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="discount_price" class="form-label">Discount Price (Optional)</label>
+                                        <input type="number" step="0.01" name="discount_price" id="discount_price" class="form-control" value="{{ product.discount_price|default_if_none:'' }}">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="color" class="form-label">Color</label>
+                                        <input type="text" name="color" id="color" class="form-control" value="{{ product.color }}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product Image Section -->
+                        <div class="form-section">
+                            <h5 class="section-title">Product Image</h5>
+                            <div class="mb-3">
+                                <label for="image" class="form-label">Product Image</label>
+                                <input type="file" name="image" id="image" class="form-control">
+                                {% if product.image %}
+                                    <div class="mt-3">
+                                        <img src="{{ product.image.url }}" alt="Current Image" class="img-thumbnail" style="max-width: 200px;">
+                                        <div class="form-text">Current image</div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Size Information Section -->
+                        <div class="form-section">
+                            <h5 class="section-title">Size Information</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="size_type" class="form-label">Size Type</label>
+                                        <select name="size_type" id="size_type" class="form-select" required>
+                                            <option value="alphabet" {% if product.size_type == "alphabet" %}selected{% endif %}>Alphabet (XS, S, M, etc.)</option>
+                                            <option value="numeric" {% if product.size_type == "numeric" %}selected{% endif %}>Numeric (28, 30, etc.)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Available Sizes</label>
+                                        <div id="size-options" class="d-flex flex-wrap gap-2">
+                                            {% for size in alphabet_sizes %}
+                                                <div class="form-check alphabet-size">
+                                                    <input type="checkbox" name="sizes" value="{{ size }}" class="form-check-input"
+                                                           {% if size in current_sizes %}checked{% endif %}>
+                                                    <label class="form-check-label">{{ size }}</label>
+                                                </div>
+                                            {% endfor %}
+                                            {% for size in numeric_sizes %}
+                                                <div class="form-check numeric-size" style="display: none;">
+                                                    <input type="checkbox" name="sizes" value="{{ size }}" class="form-check-input"
+                                                           {% if size in current_sizes %}checked{% endif %}>
+                                                    <label class="form-check-label">{{ size }}</label>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product Details Section -->
+                        <div class="form-section">
+                            <h5 class="section-title">Product Details</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="material" class="form-label">Material</label>
+                                        <input type="text" name="material" id="material" class="form-control" value="{{ product.material }}">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="package_contains" class="form-label">Package Contains</label>
+                                        <input type="text" name="package_contains" id="package_contains" class="form-control" value="{{ product.package_contains }}">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="marketed_by" class="form-label">Marketed By</label>
+                                        <input type="text" name="marketed_by" id="marketed_by" class="form-control" value="{{ product.marketed_by }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="imported_by" class="form-label">Imported By</label>
+                                        <input type="text" name="imported_by" id="imported_by" class="form-control" value="{{ product.imported_by }}">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="country_of_origin" class="form-label">Country of Origin</label>
+                                        <input type="text" name="country_of_origin" id="country_of_origin" class="form-control" value="{{ product.country_of_origin }}">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="net_quantity" class="form-label">Net Quantity</label>
+                                        <input type="text" name="net_quantity" id="net_quantity" class="form-control" value="{{ product.net_quantity }}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="commodity" class="form-label">Commodity</label>
+                                <input type="text" name="commodity" id="commodity" class="form-control" value="{{ product.commodity }}">
+                            </div>
+                        </div>
+
+                        <!-- Description Section -->
+                        <div class="form-section">
+                            <h5 class="section-title">Description</h5>
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Product Description</label>
+                                <textarea name="description" id="description" class="form-control" rows="4">{{ product.description }}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="customer_care_address" class="form-label">Customer Care Address</label>
+                                <textarea name="customer_care_address" id="customer_care_address" class="form-control" rows="3">{{ product.customer_care_address }}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Status Section -->
+                        <div class="form-section">
+                            <h5 class="section-title">Status Settings</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Stock Available</label>
+                                        <div class="d-flex gap-3">
+                                            <div class="form-check">
+                                                <input type="radio" name="stock_available" value="yes" id="stock_yes" class="form-check-input"
+                                                       {% if product.stock_available %}checked{% endif %}>
+                                                <label for="stock_yes" class="form-check-label">Yes</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input type="radio" name="stock_available" value="no" id="stock_no" class="form-check-input"
+                                                       {% if not product.stock_available %}checked{% endif %}>
+                                                <label for="stock_no" class="form-check-label">No</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Visibility</label>
+                                        <div class="d-flex gap-3">
+                                            <div class="form-check">
+                                                <input type="radio" name="is_visible" value="yes" id="visible_yes" class="form-check-input"
+                                                       {% if product.is_visible %}checked{% endif %}>
+                                                <label for="visible_yes" class="form-check-label">Visible</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input type="radio" name="is_visible" value="no" id="visible_no" class="form-check-input"
+                                                       {% if not product.is_visible %}checked{% endif %}>
+                                                <label for="visible_no" class="form-check-label">Hidden</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a href="{% url 'brand_products' %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toggle size options based on size_type selection
+        document.getElementById("size_type").addEventListener("change", function() {
+            const isAlphabet = this.value === "alphabet";
+            document.querySelectorAll(".alphabet-size").forEach(el => {
+                el.style.display = isAlphabet ? "block" : "none";
+            });
+            document.querySelectorAll(".numeric-size").forEach(el => {
+                el.style.display = isAlphabet ? "none" : "block";
+            });
+        });
+        
+        // Trigger on load to set initial state
+        document.getElementById("size_type").dispatchEvent(new Event("change"));
+    </script>
+</body>
+</html>

@@ -1,0 +1,404 @@
+/* Ensure the main CSS file includes these imports if not already present */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+/* Base Styles for Body */
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9fafb; /* Light gray background for a clean look */
+    color: #333; /* Darker text for readability */
+}
+
+/* Product Container */
+.product-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Product Detail Container */
+.product-detail-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    align-items: flex-start;
+    background-color: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    padding: 2rem;
+}
+
+/* Product Image Container */
+.product-image-container {
+    width: 500px;
+    height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure the image fits within the container */
+.product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Ensures the full image is visible without being cropped */
+    transition: transform 0.3s ease;
+}
+
+.product-image:hover {
+    transform: scale(1.03);
+}
+
+/* Product Info Container */
+.product-info-container {
+    flex: 1;
+    min-width: 300px;
+}
+
+.brand-name {
+    color: #f97316; /* Orange accent */
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.product-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1f2937; /* Dark gray */
+    margin: 0 0 1rem;
+}
+
+.price-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.discounted-price {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.discount-badge {
+    background-color: #fed7aa; /* Light orange */
+    color: #f97316;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+}
+
+.original-price {
+    color: #6b7280; /* Gray */
+    text-decoration: line-through;
+    font-size: 1.25rem;
+}
+
+.color-selector {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 15px 0;
+    }
+.color-swatch {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 1px solid #ccc;
+        display: inline-block;
+    }
+.color-hex {
+        font-family: 'Roboto', sans-serif;
+        font-weight: 700;
+        color: #333;
+}
+
+/* Size Selector */
+.size-selector {
+    margin: 1.5rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centers the content */
+    margin-top: 5.5rem;
+}
+
+.size-selector p:first-child {
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 0.75rem;
+    font-size: 1.5rem;
+}
+
+#size-label {
+    font-size: 1.5rem;
+    color: #1f2937;
+    margin-bottom: 1rem;
+}
+
+/* Size Options */
+.size-options {
+    display: flex;
+    gap: 1rem; /* More spacing between sizes */
+    justify-content: center;
+}
+
+.size-option {
+    width: 4rem; /* Increase size */
+    height: 4rem;
+    font-size: 1.3rem; /* Bigger text */
+    font-weight: 600;
+    border: 3px solid #d1d5db;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #374151;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.size-option:hover {
+    border-color: #f97316;
+    color: #f97316;
+    transform: scale(1.1);
+}
+
+.size-option.selected-size {
+    background-color: #f97316;
+    color: #fff;
+    border-color: #f97316;
+    transform: scale(1.1);
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 1.5rem; /* More spacing */
+    margin-top: 2rem;
+    justify-content: center;
+}
+
+.add-to-cart, .wishlist {
+    background: linear-gradient(to right, #f97316, #ea580c);
+    color: #fff;
+    font-weight: 700;
+    margin-top: 3rem;
+    padding: 1rem 2rem; /* Bigger padding */
+    font-size: 1.5rem;
+    border: none;
+    border-radius: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+.add-to-cart{
+    min-width: 200px; /* Ensures a minimum width */
+    width: 100%; /* Makes it stretch within its container */
+    max-width: 300px; /* Prevents excessive stretching */
+    text-align: center;
+    padding-left: 10rem;
+}
+
+.wishlist {
+    padding: 1rem;
+}
+
+
+.btn-hover:hover {
+    transform: translateY(-2px);
+    background-color: #ea580c; /* Darker orange on hover */
+}
+
+/* Product Details Section */
+.details-section {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.details-section h2 {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+}
+
+.details-content {
+    display: grid;
+    gap: 1rem;
+}
+
+.basic-details p, #extra-details p {
+    color: #4b5563;
+    font-size: 1.5rem;
+    margin: 0.5rem 0;
+}
+
+.basic-details span, #extra-details span {
+    font-weight: 600;
+    color : #1f2937;
+}
+
+.hidden {
+    display: none;
+}
+
+.toggle-details {
+    background: none;
+    border: none;
+    color: #f97316;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: color 0.3s ease;
+}
+
+.toggle-details:hover {
+    color: #ea580c;
+}
+
+/* Reviews Section */
+.reviews-section {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.reviews-section h2 {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+}
+
+.reviews-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.review {
+    padding: 1.5rem;
+    background-color: #f9fafb;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.stars i {
+    color: #fbbf24; /* Yellow for stars */
+    font-size: 2rem;
+}
+
+.rating span {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 1.5rem;
+}
+
+.review-text {
+    color: #4b5563;
+    font-size: 1.5rem;
+    line-height: 1.5;
+}
+
+.review-author {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+/* Similar Products Section */
+.similar-products {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.similar-products h2 {
+    font-size: 3rem;
+    text-align: center;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* Forces 4 columns */
+    gap: 1.5rem;
+}
+
+.product-card {
+    width: 250px;
+    height: 300px;
+    background-color: #f9fafb;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.product-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: contain;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover img {
+    transform: scale(1.05);
+}
+
+.product-card h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0.5rem 0;
+}
+
+.product-card p {
+    font-size: 1.1rem;
+    color: #4b5563;
+    font-weight: 500;
+}

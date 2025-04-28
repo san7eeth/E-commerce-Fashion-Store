@@ -1,0 +1,142 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- ====== Favicon ====== -->
+    <link rel="shortcut icon" href="{% static 'ecommerceapp/images/favicon-32x32.png' %}" type="image/png" />
+    <!-- ====== Boxicons ====== -->
+    <link href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css" rel="stylesheet" />
+    <!-- ====== Swiper CSS ====== -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <!-- ====== Custom CSS ====== -->
+    <link rel="stylesheet" href="{% static 'ecommerceapp/css/styles.css' %}">
+    <title>Fashion Shop</title>
+  </head>
+<body>
+  <!-- ====== Header ====== -->
+  <header class="header">
+    <!-- ====== Navigation ====== -->
+    <nav class="navbar">
+      <div class="row container d-flex">
+          
+          <!-- Logo -->
+          <div class="logo">
+              <img src="{% static 'ecommerceapp/images/logo.svg' %}" alt="Logo" />
+          </div>
+  
+          <!-- Navigation Links -->
+          <div class="nav-list d-flex">
+            <a href="{% url 'index' %}">Home</a>
+            <a href="/shop">Shop</a>
+            <a href="/about">About Us</a>
+            <a href="{% url 'index' %}#blog-section" id="blog-link">Blog</a>
+            <a href="{% url 'ContactUs' %}">ContactUs</a>
+  
+            <!-- Close Button for Mobile -->
+            <div class="close">
+                <i class="bx bx-x"></i>
+            </div>
+  
+            <!-- User Login -->
+            <a class="user-link" href="#">Login</a>
+          </div>
+  
+          <!-- Icons Section -->
+          <div class="icons d-flex">
+              <!-- Search Bar -->
+              <div class="icon d-flex" id="search-icon">
+                <i class="bx bx-search"></i>
+              </div>
+              
+              <!-- Cart -->
+              <div class="icon d-flex" id="cart-icon">
+                <a href="{% url 'login' %}">
+                  <i class="bx bx-cart"></i>
+                </a>
+              </div>
+  
+              <!-- User Icon -->
+              <div class="icon user-icon d-flex">
+                <a href="{% url 'login' %}">
+                    <i class="bx bx-user"></i>
+                </a>
+              </div>
+          </div>
+  
+          <!-- Hamburger Menu for Mobile -->
+          <div class="hamburger">
+              <i class="bx bx-menu-alt-right"></i>
+          </div>
+      </div>
+    </nav>
+  </header>
+
+  <script>
+    // Custom Smooth Scroll Function
+    function smoothScroll(target, duration) {
+      const start = window.pageYOffset;
+      const distance = target - start;
+      let startTime = null;
+
+      // Easing function: easeInOutQuad
+      function ease(t, b, c, d) {
+        t /= d / 2;
+        if (t < 1) return (c / 2) * t * t + b;
+        t--;
+        return (-c / 2) * (t * (t - 2) - 1) + b;
+      }
+
+      function animation(currentTime) {
+        if (startTime === null) startTime = currentTime;
+        const timeElapsed = currentTime - startTime;
+        const run = ease(timeElapsed, start, distance, duration);
+        window.scrollTo(0, run);
+        if (timeElapsed < duration) requestAnimationFrame(animation);
+      }
+
+      // Start animation only if there's a distance to scroll
+      if (distance !== 0) {
+        requestAnimationFrame(animation);
+      }
+    }
+
+    // Blog Link Smooth Scroll Logic
+    document.addEventListener('DOMContentLoaded', function() {
+      const blogLink = document.getElementById("blog-link");
+      if (blogLink) {
+        blogLink.addEventListener("click", function(e) {
+          const isHomePage = window.location.pathname === "{% url 'index' %}";
+          const blogSection = document.getElementById("blog-section");
+
+          if (isHomePage && blogSection) {
+            e.preventDefault();
+            const targetPosition = blogSection.getBoundingClientRect().top + window.pageYOffset;
+            smoothScroll(targetPosition, 1500); // 1.5s duration
+          }
+          // If not on customerhome, href redirects to customerhome#blog-section
+        });
+      }
+
+      // Search icon click handler
+      const searchIcon = document.getElementById("search-icon");
+      if (searchIcon) {
+        searchIcon.addEventListener("click", function() {
+          window.location.href = "/shop";
+        });
+      }
+
+      // Scroll on Page Load if Hash is Present
+      if (window.location.hash === "#blog-section") {
+        const blogSection = document.getElementById("blog-section");
+        if (blogSection) {
+          setTimeout(() => {
+            const targetPosition = blogSection.getBoundingClientRect().top + window.pageYOffset;
+            smoothScroll(targetPosition, 1500); // 1.5s duration
+          }, 100);
+        }
+      }
+    });
+  </script>

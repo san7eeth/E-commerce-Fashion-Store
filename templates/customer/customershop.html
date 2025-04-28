@@ -1,0 +1,73 @@
+{% load static %}
+{% include "customer/customerheader.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Shop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        function openCameraInput() {
+            document.getElementById("imageInput").click();
+        }
+    </script>   
+
+    <style>
+        #camera-icon{
+            right: 460px;
+        }
+    </style>    
+</head>
+<body>
+    <!-- ====== Search Section ====== -->
+    <section class="search-section">
+        <div class="container">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="search-wrapper">
+                    <input type="text" name="search_query" id="searchInput" placeholder="Search for products..." value="{{ search_query|default:'' }}" onkeypress="if(event.key === 'Enter') this.form.submit();" />
+                    <div class="icon d-flex" id="search-icon">
+                        <i class="bx bx-search"></i>
+                    </div>
+                </div>
+                <div class="icon d-flex" id="camera-icon" onclick="openCameraInput()">
+                    <i class="bx bx-camera"></i>
+                </div>
+                <input type="file" id="imageInput" name="search_image" accept="image/*" style="display: none;" onchange="this.form.submit();" />
+            </form>
+        </div>
+    </section>
+
+    <!-- ====== Products Section ====== -->
+<section class="section products py-16 flex-grow">
+    <div class="title text-center mb-12">
+        <h2 class="text-4xl font-bold text-gray-900 tracking-tight">Our Products</h2>
+        <p class="mt-2 text-gray-600">Explore our exclusive collection</p>
+    </div>
+
+    <div class="container max-w-screen-xl mx-auto px-6"> <!-- Increased width and padding -->
+        {% if products %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10"> <!-- Increased gap -->
+            {% for product in products %}
+            <a href="{% url 'product_page' product.product_id %}" class="block group bg-white rounded-xl shadow-md overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                <div class="relative">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" 
+                        class="w-full h-80 object-contain transition-transform duration-300 group-hover:scale-105"/> <!-- Changed to h-80 and object-contain -->
+                </div>
+                <div class="p-6 text-center"> <!-- Increased padding -->
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">{{ product.brand.brand_name }}</h3>
+                    <h4 class="text-xl font-bold text-gray-900 mt-2">{{ product.name }}</h4> <!-- Slightly larger text -->
+                    <span class="text-2xl font-semibold text-orange-600 mt-3 block">₹{{ product.discount_price }}</span> <!-- Larger price text -->
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-center text-gray-500 text-lg py-10 col-span-full">No products available.</p>
+        {% endif %}
+    </div>
+</section>
+
+
+    {% include "customer/customerfooter.html" %}
+</body>
+</html>

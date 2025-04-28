@@ -1,0 +1,201 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brand Verification - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif;
+            background-color: white;
+        }
+        .fade-in { 
+            animation: fadeIn 0.3s ease-in; 
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px -5px rgba(0, 0, 0, 0.07), 0 8px 8px -5px rgba(0, 0, 0, 0.03);
+        }
+    </style>
+</head>
+<body class="bg-white">
+    <div class="flex min-h-screen">
+        {% include "admin/sidebar.html" %}
+
+        <!-- Main Content -->
+        <div class="flex-1 p-4 lg:p-6 ml-[280px]">
+            <header class="mb-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between">
+                    <h1 class="text-xl font-bold text-gray-900 mb-2 md:mb-0">Brand Verification</h1>
+                    <div class="flex space-x-3">
+                        <div class="relative">
+                           
+                        </div>
+                        <select class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                            <option value="all">All Status</option>
+                            <option value="approved">Approved</option>
+                            <option value="unapproved">Unapproved</option>
+                        </select>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Messages -->
+            {% if messages %}
+                <div class="mb-4 space-y-1.5">
+                    {% for message in messages %}
+                        <div class="p-3 rounded-lg fade-in text-sm {% if message.tags == 'success' %}bg-green-50 text-green-800{% elif message.tags == 'error' %}bg-red-50 text-red-800{% else %}bg-blue-50 text-blue-800{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Brands List -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {% if brands %}
+                    {% for brand in brands %}
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 h-96 flex flex-col card-hover">
+                            <div class="p-4 flex-1 flex flex-col">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h2 class="text-base font-semibold text-gray-900 truncate">{{ brand.brand_name }}</h2>
+                                    <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium 
+                                        {% if brand.login.is_approved %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                        {{ brand.login.is_approved|yesno:"Approved,Unapproved" }}
+                                    </span>
+                                </div>
+                                
+                                <div class="space-y-1.5 mb-3 text-xs">
+                                    <div class="flex">
+                                        <span class="text-gray-500 w-24 flex-shrink-0">Representative:</span>
+                                        <span class="text-gray-900 font-medium truncate">{{ brand.representative_name }}</span>
+                                    </div>
+                                    <div class="flex">
+                                        <span class="text-gray-500 w-24 flex-shrink-0">Phone:</span>
+                                        <span class="text-gray-900 truncate">{{ brand.phone }}</span>
+                                    </div>
+                                    <div class="flex">
+                                        <span class="text-gray-500 w-24 flex-shrink-0">Address:</span>
+                                        <span class="text-gray-900 truncate">{{ brand.address|truncatewords:3 }}</span>
+                                    </div>
+                                    <div class="flex">
+                                        <span class="text-gray-500 w-24 flex-shrink-0">Pincode:</span>
+                                        <span class="text-gray-900 truncate">{{ brand.pincode|default:"N/A" }}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-2 mb-3">
+                                    <div class="bg-gray-50 p-2 rounded text-xs">
+                                        <p class="text-gray-500 text-xs mb-0.5">PAN Card</p>
+                                        <p class="font-medium truncate">{{ brand.pan_card|default:"N/A" }}</p>
+                                    </div>
+                                    <div class="bg-gray-50 p-2 rounded text-xs">
+                                        <p class="text-gray-500 text-xs mb-0.5">GSTIN</p>
+                                        <p class="font-medium truncate">{{ brand.gstin|default:"N/A" }}</p>
+                                    </div>
+                                    <div class="bg-gray-50 p-2 rounded text-xs">
+                                        <p class="text-gray-500 text-xs mb-0.5">Bank Account</p>
+                                        <p class="font-medium truncate">{{ brand.bank_account_number|default:"N/A" }}</p>
+                                    </div>
+                                    <div class="bg-gray-50 p-2 rounded text-xs">
+                                        <p class="text-gray-500 text-xs mb-0.5">IFSC Code</p>
+                                        <p class="font-medium truncate">{{ brand.ifsc_code|default:"N/A" }}</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex flex-wrap gap-2 mb-3 mt-auto">
+                                    {% if brand.logo %}
+                                        <a href="{{ brand.logo.url }}" target="_blank" class="inline-flex items-center px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs hover:bg-blue-100">
+                                            <i class="fas fa-image mr-1"></i> Logo
+                                        </a>
+                                    {% endif %}
+                                    
+                                    {% if brand.aadhaar_photo %}
+                                        <a href="{{ brand.aadhaar_photo.url }}" target="_blank" class="inline-flex items-center px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs hover:bg-blue-100">
+                                            <i class="fas fa-id-card mr-1"></i> Aadhaar
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <button onclick="toggleVerification('{{ brand.login.id }}')"
+                                    class="w-full py-2 text-sm font-medium text-white {% if brand.login.is_approved %}bg-red-600 hover:bg-red-700{% else %}bg-green-600 hover:bg-green-700{% endif %} transition-colors duration-200">
+                                {{ brand.login.is_approved|yesno:"Unapprove,Approve" }} Brand
+                            </button>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-span-full p-8 text-center bg-gray-50 rounded-lg">
+                        <div class="flex flex-col items-center">
+                            <i class="fas fa-store text-gray-300 text-4xl mb-3"></i>
+                            <p class="text-gray-500 text-sm">No brands found for verification.</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleVerification(loginId) {
+            Swal.fire({
+                title: "Toggle approval?",
+                text: "This will change the brand's approval status.",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, toggle it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch("{% url 'brand_verification' %}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify({ login_id: loginId, action: 'toggle_verification' })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.message) {
+                            Swal.fire({
+                                title: "Success!",
+                                text: data.message,
+                                icon: "success",
+                                confirmButtonColor: "#3085d6"
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                title: "Error!",
+                                text: data.error,
+                                icon: "error",
+                                confirmButtonColor: "#3085d6"
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            title: "Error!",
+                            text: "An error occurred while toggling approval.",
+                            icon: "error",
+                            confirmButtonColor: "#3085d6"
+                        });
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+</html>

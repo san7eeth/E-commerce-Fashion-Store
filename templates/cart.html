@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <link rel="stylesheet" href="{% static 'ecommerceapp/css/styles.css' %}">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    {% include "header.html" %}
+    
+    <main class="cart-container">
+        <h1 class="cart-title">Your Cart</h1>
+        <div class="cart-table-container">
+            <table class="cart-table">
+                <thead>
+                    <tr class="cart-header">
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                    <tr class="cart-item">
+                        <td class="cart-item-details">
+                            <img src="{{ item.image_url }}" alt="{{ item.name }}" class="cart-item-image">
+                            <div>
+                                <p class="cart-item-name">{{ item.name }}</p>
+                                <p class="cart-item-price">${{ item.price }}</p>
+                            </div>
+                        </td>
+                        <td class="cart-item-quantity">
+                            <div class="quantity-controls">
+                                <button class="quantity-button decrease" data-id="{{ item.id }}"><i class="fas fa-minus"></i></button>
+                                <input type="text" class="quantity-input" value="{{ item.quantity }}" readonly>
+                                <button class="quantity-button increase" data-id="{{ item.id }}"><i class="fas fa-plus"></i></button>
+                                <button class="remove-button" data-id="{{ item.id }}"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </td>
+                        <td class="cart-item-total">Rs{{ item.total }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="cart-summary">
+            <p class="summary-total">Estimated Total: Rs{{ cart_total }}</p>
+            <p class="summary-note">Taxes, discounts, and shipping calculated at checkout.</p>
+            <button class="checkout-button">Proceed to Checkout</button>
+        </div>
+    </main>
+    
+    {% include "footer.html" %}
+    
+    <script src="{% static 'ecommerceapp/js/main.js' %}"></script>
+    <script src="{% static 'ecommerceapp/js/cart.js' %}"></script>
+</body>
+</html>

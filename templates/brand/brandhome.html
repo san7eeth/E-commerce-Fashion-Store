@@ -1,0 +1,139 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Dashboard - Brand Account</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: white;
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px -5px rgba(0, 0, 0, 0.07), 0 8px 8px -5px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-white">
+    <div class="flex min-h-screen">
+        {% include "brand/sidebar.html" %}
+
+        <!-- Main Content -->
+        <div class="flex-1 p-4 lg:p-6 ">
+            <header class="mb-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <h1 class="text-xl font-bold text-gray-900">Dashboard</h1>
+                </div>
+            </header>
+
+            <!-- Messages -->
+            {% if messages %}
+                <div class="mb-4 space-y-1.5">
+                    {% for message in messages %}
+                        <div class="p-3 rounded-lg fade-in text-sm {% if message.tags == 'success' %}bg-green-50 text-green-800{% elif message.tags == 'error' %}bg-red-50 text-red-800{% else %}bg-blue-50 text-blue-800{% endif %}">
+                            <i class="fas {% if message.tags == 'error' %}fa-circle-exclamation{% else %}fa-circle-info{% endif %} mr-2"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                <!-- Card 1: Total Orders -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-4 flex items-center card-hover">
+                    <div class="p-3 bg-blue-50 rounded-lg">
+                        <i class="fas fa-shopping-cart text-xl text-blue-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h2 class="text-sm font-medium text-gray-600">Total Orders</h2>
+                        <p class="text-2xl font-bold text-gray-900">{{ total_orders }}</p>
+                    </div>
+                </div>
+                <!-- Card 2: Total Products -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-4 flex items-center card-hover">
+                    <div class="p-3 bg-green-50 rounded-lg">
+                        <i class="fas fa-box-open text-xl text-green-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h2 class="text-sm font-medium text-gray-600">Total Products</h2>
+                        <p class="text-2xl font-bold text-gray-900">{{ total_products }}</p>
+                    </div>
+                </div>
+                <!-- Card 3: Total Reviews -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-4 flex items-center card-hover">
+                    <div class="p-3 bg-yellow-50 rounded-lg">
+                        <i class="fas fa-star text-xl text-yellow-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h2 class="text-sm font-medium text-gray-600">Total Reviews</h2>
+                        <p class="text-2xl font-bold text-gray-900">{{ total_reviews }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Orders -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-bold text-gray-900">Recent Orders</h2>
+                </div>
+                {% if recent_orders %}
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr class="text-left text-xs font-medium text-gray-500 uppercase">
+                                    <th class="py-3 px-4">Order ID</th>
+                                    <th class="py-3 px-4">Customer</th>
+                                    <th class="py-3 px-4">Date</th>
+                                    <th class="py-3 px-4">Status</th>
+                                    <th class="py-3 px-4">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-700 text-sm">
+                                {% for order in recent_orders %}
+                                    <tr class="border-t border-gray-100 hover:bg-gray-50">
+                                        <td class="py-3 px-4 font-medium">{{ order.order_id }}</td>
+                                        <td class="py-3 px-4">{{ order.customer.name }}</td>
+                                        <td class="py-3 px-4">{{ order.created_at|date:"Y-m-d" }}</td>
+                                        <td class="py-3 px-4">
+                                            <span class="text-xs font-medium px-2 py-1 rounded-full
+                                                {% if order.status == 'pending' %}bg-yellow-50 text-yellow-700
+                                                {% elif order.status == 'processing' %}bg-blue-50 text-blue-700
+                                                {% elif order.status == 'shipped' %}bg-indigo-50 text-indigo-700
+                                                {% elif order.status == 'out_for_delivery' %}bg-purple-50 text-purple-700
+                                                {% elif order.status == 'delivered' %}bg-green-50 text-green-700
+                                                {% else %}bg-red-50 text-red-700{% endif %}">
+                                                {{ order.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td class="py-3 px-4 font-medium">₹{{ order.total_amount|floatformat:2 }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center p-8 bg-gray-50 rounded-lg">
+                        <div class="flex flex-col items-center">
+                            <i class="fas fa-inbox text-gray-300 text-4xl mb-3"></i>
+                            <p class="text-gray-500 text-sm">No recent orders found.</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
