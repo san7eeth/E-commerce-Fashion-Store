@@ -516,14 +516,14 @@ def brand_products(request):
 
         try:
             category = get_object_or_404(Category, id=int(category_id))
-            price = Decimal(price)  # ✅ Convert price safely
+            price = Decimal(price)  # Convert price safely
 
-            with transaction.atomic():  # ✅ Prevent partial inserts
-                # ✅ Auto-generate product code if empty
+            with transaction.atomic():  #  Prevent partial inserts
+                #  Auto-generate product code if empty
                 if not product_code:
                     product_code = Product().generate_unique_product_code()
 
-                # ✅ Create product
+                # Create product
                 product = Product.objects.create(
                     name=name,
                     brand=brand,
@@ -546,9 +546,9 @@ def brand_products(request):
                     customer_care_address=customer_care_address,
                     commodity=commodity
                 )
-                print(f"✅ Product {product.name} created successfully with ID {product.id}")
+                print(f" Product {product.name} created successfully with ID {product.id}")
 
-                # ✅ Validate and assign selected sizes (No stock field)
+                # Validate and assign selected sizes (No stock field)
                 valid_sizes = alphabet_sizes if size_type == "alphabet" else numeric_sizes
                 for size in selected_sizes:
                     if size in valid_sizes:
@@ -561,7 +561,7 @@ def brand_products(request):
             return redirect("brand_products")
 
         except Exception as e:
-            print(f"❌ ERROR: {e}")
+            print(f" ERROR: {e}")
             messages.error(request, f"Error adding product: {e}")
 
     return render(request, "brand/products.html", {
