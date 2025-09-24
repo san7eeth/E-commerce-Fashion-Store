@@ -1,4 +1,4 @@
-# E-commerce Fashion Store 🛍️
+# E-commerce Fashion Store using AI 🛍️
 
 An E-commerce Fashion Store built with Django and Python, offering a platform for users to browse, search, and purchase fashion products easily.
 
@@ -19,8 +19,8 @@ An E-commerce Fashion Store built with Django and Python, offering a platform fo
 - **Frontend**: HTML5, CSS3, JavaScript
 - **Backend**: Python, Django
 - **Database**: SQLite (for development)
-- **AI Model**: MobileNetV2 for image feature extraction
-- **Other Tools**: Tesseract OCR (optional for text recognition), Django Admin Panel
+- **AI Model**: ResNet50 for image feature extraction
+
 
 ## 📂 Project Structure
 
